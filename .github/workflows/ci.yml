@@ -64,13 +64,6 @@ jobs:
       check_rex_anddea_beta: ${{ steps.check-rex-anddea-beta.outputs.new_patch }}
       check_twitter_piko_beta: ${{ steps.check-twitter-piko-beta.outputs.new_patch }}
 
-  Patch-Revanced:
-    name: Patch Revanced
-    needs: check
-    if: ${{ needs.check.outputs.check_rv == 1 }}
-    uses: ./.github/workflows/manual-patch.yml
-    with:
-      org: "Revanced"
   Patch-Revanced-Beta:
     name: Patch Revanced Beta
     needs: check
@@ -78,20 +71,6 @@ jobs:
     uses: ./.github/workflows/manual-patch.yml
     with:
       org: "Revanced Beta"
-  Patch-ReX:
-    name: Patch ReX
-    needs: check
-    if: ${{ needs.check.outputs.check_rex == 1 }}
-    uses: ./.github/workflows/manual-patch.yml
-    with:
-      org: "ReX"
-  Patch-ReX-anddea-stable:
-    name: Patch ReX forked by anddea stable
-    needs: check
-    if: ${{ needs.check.outputs.check_rex_anddea_stable == 1 }}
-    uses: ./.github/workflows/manual-patch.yml
-    with:
-      org: "ReX-anddea-stable"
   Patch-ReX-anddea-beta:
     name: Patch ReX forked by anddea beta
     needs: check
@@ -99,20 +78,6 @@ jobs:
     uses: ./.github/workflows/manual-patch.yml
     with:
       org: "ReX-anddea-beta"
-  Patch-Revanced-Extended:
-    name: Patch Revanced Extended
-    needs: check
-    if: ${{ needs.check.outputs.check_rve == 1 }}
-    uses: ./.github/workflows/manual-patch.yml
-    with:
-      org: "Revanced Extended"
-  Patch-Twitter-Piko-Stable:
-    name: Patch Twitter Piko Stable
-    needs: check
-    if: ${{ needs.check.outputs.check_twitter_piko_stable == 1 }}
-    uses: ./.github/workflows/manual-patch.yml
-    with:
-      org: "Twitter Piko Stable"
   Patch-Twitter-Piko-Beta:
     name: Patch Twitter Piko Beta
     needs: check
@@ -120,17 +85,3 @@ jobs:
     uses: ./.github/workflows/manual-patch.yml
     with:
       org: "Twitter Piko Beta"
-  Patch-Revanced-Extended-For-Android-6-7:
-    name: Patch Revanced Extended For Android 6 & 7
-    needs: check
-    if: ${{ needs.check.outputs.check_rve67 == 1 }}
-    uses: ./.github/workflows/manual-patch.yml
-    with:
-      org: "Revanced Extended Android 6,7"
-  Patch-Revanced-Extended-For-Android-5:
-    name: Patch Revanced Extended For Android 5
-    needs: check
-    if: ${{ needs.check.outputs.check_rve5 == 1 }}
-    uses: ./.github/workflows/manual-patch.yml
-    with:
-      org: "Revanced Extended Android 5"
