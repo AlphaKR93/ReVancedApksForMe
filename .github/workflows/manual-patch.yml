@@ -24,11 +24,11 @@ on:
         description: 'Do not change value below'
         required: false
         default: '1'
-      rvx_version:
+      rex:
         description: "ReVanced YT Version"
         required: false
         default: ''
-      rvxm_version:
+      rexm:
         description: "ReVanced YT Music Version"
         required: false
         default: ''
