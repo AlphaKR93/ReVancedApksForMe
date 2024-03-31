@@ -24,6 +24,14 @@ on:
         description: 'Do not change value below'
         required: false
         default: '1'
+      rvx_version:
+        description: "ReVanced YT Version"
+        required: false
+        default: ''
+      rvxm_version:
+        description: "ReVanced YT Music Version"
+        required: false
+        default: ''
   workflow_call:
     inputs:
       org:
@@ -77,7 +85,7 @@ jobs:
       - name: Patch apk
         id: patch-rex-anddea-beta
         if: steps.check-gh-rex-anddea-beta.outputs.internet_error == '0'
-        run: bash src/build/ReX-anddea.sh prerelease
+        run: bash src/build/ReX-anddea.sh prerelease ${{ github.event.inputs.rex }} ${{ github.event.inputs.rexm }}
       - name: Releasing APK files
         id: release-rex-anddea-beta
         if: steps.check-gh-rex-anddea-beta.outputs.internet_error == '0'
