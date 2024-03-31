@@ -202,15 +202,16 @@ patch() {
 				fi
 			fi
 		fi
-		eval java -jar revanced-cli*.jar $p\
+		eval java -jar revanced-cli*.jar $p \
 		$b revanced-patches*.jar \
-		$m revanced-integrations*.apk\
-		$excludePatches\
+		$m revanced-integrations*.apk \
+		$excludePatches \
 		$includePatches \
 		--options=./src/options/$2.json \
 		--out=./release/$1-$2.apk \
 		--keystore=./src/$ks.keystore \
 		$pu \
+                --force \
 		./download/$a$1.apk
   		unset version
 		unset excludePatches
