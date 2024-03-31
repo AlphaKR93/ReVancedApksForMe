@@ -25,13 +25,3 @@ get_apk "youtube-music-arm64-v8a" "youtube-music" "google-inc/youtube-music/yout
 patch "youtube-music-arm64-v8a" "ReX-anddea" "inotia"
 
 #################################################
-
-rm -f revanced-cli*
-dl_gh "revanced-cli" "FiorenMas" "latest"
-# Split architecture Youtube:
-get_patches_key "youtube-ReX"
-for i in {0..3}; do
-    split_arch "youtube" "youtube-${archs[i]}-ReX" "$(gen_rip_libs ${libs[i]})"
-done
-
-#################################################
