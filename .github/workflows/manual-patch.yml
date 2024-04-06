@@ -46,11 +46,9 @@ jobs:
       matrix:
         Include:
           - org: "Revanced-Beta"
-            run: "1"
+            run: "A"
           - org: "Revanced-Beta"
-            run: "2"
-          - org: "Revanced-Beta"
-            run: "3"
+            run: "B"
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.1
