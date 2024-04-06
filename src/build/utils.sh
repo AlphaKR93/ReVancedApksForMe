@@ -86,19 +86,20 @@ get_patches_key() {
 	includePatches=""
 	while IFS= read -r line1; do
 		excludePatches+=" -e \"$line1\""
+                echo "Excluded $line1"
 	done < src/patches/$1/exclude-patches
 	export excludePatches
 
 	exclude=$(cat src/patches/$1/exclude-patches)
 	patches=$(java -jar revanced-cli-*.jar list-patches revanced-patches-*.jar -f $1 | grep Name | cut -d " " -f 2-)
 	echo $exclude
-        for patch in $patches; do
-                echo $patch
+        for patch in ${patches// /_}; do
 		if echo $exclude | grep $patch; then
-			includePatches+=" -i \"${patch//"\""/"\\\""}\""
+                        rv=${patch//_/ }
+			echo "Included $rv"
+			includePatches+=" -i \"${rv//"\""/"\\\""}\""
 		fi
 	done
-        echo $includePatches
 	export includePatches
 }
 
@@ -210,7 +211,7 @@ patch() {
 				fi
 			fi
 		fi
-                echo $excludePatches $includePatches
+                echo "The command line is: $excludePatches $includePatches"
 		eval java -jar revanced-cli*.jar $p \
 		$b revanced-patches*.jar \
 		$m revanced-integrations*.apk \
