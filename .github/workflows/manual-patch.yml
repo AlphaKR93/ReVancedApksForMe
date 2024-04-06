@@ -60,7 +60,7 @@ jobs:
       - name: Patch apk
         id: patch-rvb
         if: steps.check-gh-rvb.outputs.internet_error == '0'
-        run: bash src/build/Revanced-Beta-${{ matrix.Include.run }}.sh
+        run: bash src/build/Revanced-${{ matrix.Include.run }}.sh
       - name: Releasing APK files
         id: release-rvb
         if: steps.check-gh-rvb.outputs.internet_error == '0'
