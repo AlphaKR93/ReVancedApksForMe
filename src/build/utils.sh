@@ -95,7 +95,7 @@ get_patches_key() {
 	echo "Excluded: $exclude"
         for patch in ${patches// /_}; do
 		rv=${patch//_/ }
-		if (echo $exclude | grep -q $rv); then
+		if (echo $exclude | grep "$rv"); then
 			echo "Included $rv"
 			includePatches+=" -i \"${rv//"\""/"\\\""}\""
 		fi
