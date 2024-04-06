@@ -85,7 +85,7 @@ get_patches_key() {
 	excludePatches=""
 	includePatches=""
 	while IFS= read -r line1; do
- 		red_log "[-] $line1]"
+ 		red_log "[-] Excluded: $line1"
 		excludePatches+=" -e \"$line1\""
 	done < src/patches/$1/exclude-patches
 	export excludePatches
@@ -95,7 +95,7 @@ get_patches_key() {
         for patch in ${patches// /_}; do
 		rv=${patch//_/ }
 		if ! grep -q "$rv" src/patches/$1/exclude-patches; then
-			green_log "[+] $rv"
+			green_log "[+] Included: $rv"
 			includePatches+=" -i \"${rv//"\""/"\\\""}\""
 		fi
 	done
@@ -210,22 +210,22 @@ patch() {
 				fi
 			fi
 		fi
-                echo "The command line is: $excludePatches $includePatches"
+        echo "The command line is: java -jar revanced-cli****.jar $p $b revanced-patches****.jar $m revanced-integrations****.apk $excludePatches $includePatches --options=./src/options/$2.json --out=./release/$1-$2.apk --keystore=./src/$ks.keystore $pu --force ./download/$a$1.apk"
 		eval java -jar revanced-cli*.jar $p \
-		$b revanced-patches*.jar \
-		$m revanced-integrations*.apk \
-		$excludePatches \
-		$includePatches \
-		--options=./src/options/$2.json \
-		--out=./release/$1-$2.apk \
-		--keystore=./src/$ks.keystore \
-		$pu \
-                --force \
-		./download/$a$1.apk
+			$b revanced-patches*.jar \
+			$m revanced-integrations*.apk \
+			$excludePatches \
+			$includePatches \
+			--options=./src/options/$2.json \
+			--out=./release/$1-$2.apk \
+			--keystore=./src/$ks.keystore \
+			$pu \
+            --force \
+			./download/$a$1.apk
   		unset version
 		unset excludePatches
 		unset includePatches
-	else 
+	else
 		red_log "[-] Not found $1.apk"
 		exit 1
 	fi

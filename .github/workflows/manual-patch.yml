@@ -19,6 +19,7 @@ on:
           - 'All'
           - 'Revanced Beta'
           - 'Rex-anddea-beta'
+          - 'Rex-anddea-beta-music'
           - 'Twitter Piko Beta'
       retry_count:
         description: 'Do not change value below'
@@ -47,8 +48,6 @@ jobs:
         Include:
           - org: "Revanced-Beta"
             run: "A"
-          - org: "Revanced-Beta"
-            run: "B"
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.1
@@ -84,6 +83,29 @@ jobs:
         id: patch-rex-anddea-beta
         if: steps.check-gh-rex-anddea-beta.outputs.internet_error == '0'
         run: bash src/build/ReX-anddea.sh prerelease ${{ github.event.inputs.rex }} ${{ github.event.inputs.rexm }}
+      - name: Releasing APK files
+        id: release-rex-anddea-beta
+        if: steps.check-gh-rex-anddea-beta.outputs.internet_error == '0'
+        uses: ./.github/actions/release
+      - name: Re-run workflow if github connection not stable
+        if: always() && steps.patch-rex-anddea-beta.outcome == 'skipped' || steps.release-rex-anddea-beta.outcome == 'skipped' && env.retry_count < env.max_retries
+        uses: ./.github/actions/re-run
+  patch_rex_anddea_beta_music:
+    name: Patch ReX Music forked by anddea beta
+    if: ${{ github.event.inputs.org == 'ReX-anddea-beta-music' || github.event.inputs.org == 'All' || inputs.org == 'ReX-anddea-beta-music' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+      - name: Preparing to patch
+        uses: ./.github/actions/preparing
+      - name: Check github connection
+        id: check-gh-rex-anddea-beta
+        run: bash src/etc/connection.sh
+      - name: Patch apk
+        id: patch-rex-anddea-beta
+        if: steps.check-gh-rex-anddea-beta.outputs.internet_error == '0'
+        run: bash src/build/ReX-anddea-music.sh prerelease ${{ github.event.inputs.rex }} ${{ github.event.inputs.rexm }}
       - name: Releasing APK files
         id: release-rex-anddea-beta
         if: steps.check-gh-rex-anddea-beta.outputs.internet_error == '0'
