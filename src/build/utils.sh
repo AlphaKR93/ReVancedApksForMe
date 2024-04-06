@@ -85,8 +85,8 @@ get_patches_key() {
 	excludePatches=""
 	includePatches=""
 	while IFS= read -r line1; do
+ 		red_log "[-] $line1]"
 		excludePatches+=" -e \"$line1\""
-                echo "Excluded $line1"
 	done < src/patches/$1/exclude-patches
 	export excludePatches
 
@@ -95,7 +95,7 @@ get_patches_key() {
         for patch in ${patches// /_}; do
 		rv=${patch//_/ }
 		if ! grep -q "$rv" src/patches/$1/exclude-patches; then
-			echo "Included $rv"
+			green_log "[+] $rv"
 			includePatches+=" -i \"${rv//"\""/"\\\""}\""
 		fi
 	done
