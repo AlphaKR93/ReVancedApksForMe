@@ -92,10 +92,9 @@ get_patches_key() {
 
 	exclude=$(cat src/patches/$1/exclude-patches)
 	patches=$(java -jar revanced-cli-*.jar list-patches revanced-patches-*.jar -f $1 | grep Name | cut -d " " -f 2-)
-	echo "Excluded: $exclude"
         for patch in ${patches// /_}; do
 		rv=${patch//_/ }
-		if (echo $exclude | grep "$rv"); then
+		if (echo $exclude | grep -q "$rv"); then
 			echo "Included $rv"
 			includePatches+=" -i \"${rv//"\""/"\\\""}\""
 		fi
