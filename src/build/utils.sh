@@ -88,9 +88,14 @@ get_patches_key() {
 		excludePatches+=" -e \"$line1\""
 	done < src/patches/$1/exclude-patches
 	export excludePatches
-	while IFS= read -r line2; do
-		includePatches+=" -i \"$line2\""
-	done < src/patches/$1/include-patches
+
+	exclude=$(cat src/patches/$1/exclude-patches)
+	patches=$(java -jar revanced-cli-*.jar list-patches revanced-patches-*.jar -f $1 | grep Name | cut -d " " -f 2-)
+	for patch in $patches; do
+		if echo $exclude | grep $patch; then
+			includePatches+=" -i \"$patch\""
+		fi
+	done
 	export includePatches
 }
 

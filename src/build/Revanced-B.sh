@@ -1,4 +1,5 @@
 #!/bin/bash
+exit
 # Revanced build
 source ./src/build/utils.sh
 
