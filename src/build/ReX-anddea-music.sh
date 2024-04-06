@@ -12,7 +12,7 @@ dl_gh "revanced-cli" "inotia00" "latest"
 #################################################
 
 # Patch YouTube Music ReX:
-get_patches_key "com.google.android.apps.youtube"
+get_patches_key "com.google.android.apps.youtube.music"
 if [[ -v 3 ]]; then version=$3; else get_ver "Enable color match player" "com.google.android.apps.youtube.music"; fi
 get_apk "youtube-music-arm64-v8a" "youtube-music" "google-inc/youtube-music/youtube-music" "arm64-v8a"
 patch "youtube-music-arm64-v8a" "ReX-anddea" "inotia"
