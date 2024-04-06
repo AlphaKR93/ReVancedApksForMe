@@ -32,7 +32,7 @@ jobs:
       - name: Check new patch Twitter Piko Beta
         id: check-twitter-piko-beta
         if: steps.check-gh.outputs.internet_error == '0'
-        run: bash src/etc/ci.sh crimera/piko prerelease twitter-beta-piko.apk
+        run: bash src/etc/ci.sh crimera/piko prerelease twitter-piko.apk
       - name: Keep workflow run
         if: steps.check-gh.outputs.internet_error == '0'
         uses: gautamkrishnar/keepalive-workflow@v1
