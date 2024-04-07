@@ -17,8 +17,8 @@ on:
         type: choice
         options:
           - 'All'
-          - 'Revanced Beta'
           - 'Rex-anddea-beta'
+          - 'Rex-anddea-beta-yt'
           - 'Rex-anddea-beta-music'
           - 'Twitter Piko Beta'
       retry_count:
@@ -41,7 +41,7 @@ on:
 jobs:
   patch_rv_beta:
     name: Patch Revanced Beta
-    if: ${{ github.event.inputs.org == 'Revanced Beta' || github.event.inputs.org == 'All' || inputs.org == 'Revanced Beta' }}
+    if: ${{ github.event.inputs.org == 'Revanced Beta' || inputs.org == 'Revanced Beta' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -69,7 +69,7 @@ jobs:
         uses: ./.github/actions/re-run
   patch_rex_anddea_beta:
     name: Patch ReX forked by anddea beta
-    if: ${{ github.event.inputs.org == 'ReX-anddea-beta' || github.event.inputs.org == 'All' || inputs.org == 'ReX-anddea-beta' }}
+    if: ${{ github.event.inputs.org == 'ReX-anddea-beta' || github.event.inputs.org == 'ReX-anddea-beta-yt' || github.event.inputs.org == 'All' || inputs.org == 'ReX-anddea-beta' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -92,7 +92,7 @@ jobs:
         uses: ./.github/actions/re-run
   patch_rex_anddea_beta_music:
     name: Patch ReX Music forked by anddea beta
-    if: ${{ github.event.inputs.org == 'ReX-anddea-beta-music' || github.event.inputs.org == 'All' || inputs.org == 'ReX-anddea-beta-music' }}
+    if: ${{ github.event.inputs.org == 'ReX-anddea-beta' || github.event.inputs.org == 'ReX-anddea-beta-music' || github.event.inputs.org == 'All' || inputs.org == 'ReX-anddea-beta' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
