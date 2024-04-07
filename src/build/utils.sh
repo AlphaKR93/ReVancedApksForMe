@@ -5,10 +5,7 @@ mkdir ./release ./download
 #Setup HTMLQ
 wget -q -O ./htmlq.tar.gz https://github.com/mgdm/htmlq/releases/latest/download/htmlq-x86_64-linux.tar.gz
 tar -xf "./htmlq.tar.gz" -C "./"
-HTMLQ="./htmlq"
-
-# Setup LSPatch 
-dl_gh "lspatch" "lsposed" "latest"
+HTMLQ="./htmlq" 
 
 #################################################
 
@@ -285,4 +282,5 @@ _split_arch() {
 		exit 1
 	fi
 }
+
 #################################################

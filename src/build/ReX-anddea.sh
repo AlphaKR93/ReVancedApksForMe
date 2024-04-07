@@ -8,6 +8,7 @@ source src/build/utils.sh
 # Download requirements
 dl_gh "revanced-patches revanced-integrations" "anddea" "prerelease"
 dl_gh "revanced-cli" "inotia00" "latest"
+dl_gh "lspatch" "lsposed" "latest"
 
 #################################################
 
