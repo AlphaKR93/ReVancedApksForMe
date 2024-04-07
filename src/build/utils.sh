@@ -222,7 +222,8 @@ patch() {
 			$pu \
             --force \
 			./download/$a$1.apk
-  		unset version
+    eval java -jar jar-*-release.jar ./release/*.apk -o ./release -f -r
+  	unset version
 		unset excludePatches
 		unset includePatches
 	else
