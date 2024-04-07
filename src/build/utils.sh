@@ -7,6 +7,9 @@ wget -q -O ./htmlq.tar.gz https://github.com/mgdm/htmlq/releases/latest/download
 tar -xf "./htmlq.tar.gz" -C "./"
 HTMLQ="./htmlq"
 
+# Setup LSPatch 
+dl_gh "lspatch" "lsposed" "latest"
+
 #################################################
 
 # Colored output logs
