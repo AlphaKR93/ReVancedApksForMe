@@ -20,3 +20,8 @@ patch "twitter" "piko"
 java -jar jar-*-release.jar ./release/twitter-piko.apk -m TwiFucker-V*.apk -o ./release -f -r
 
 #################################################
+
+# Change Package Name:
+get_patches_keys
+dl_gh "revanced-patches revanced-integrations revanced-cli" "revanced" "prerelease"
+patch "twitter" "piko"
