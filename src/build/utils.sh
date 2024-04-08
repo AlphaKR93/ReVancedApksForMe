@@ -102,6 +102,22 @@ get_patches_key() {
 	export includePatches
 }
 
+get_patches_keys() {
+	excludePatches=""
+	includePatches=""
+	while IFS= read -r line1; do
+ 		red_log "[-] Excluded: $line1"
+		excludePatches+=" -e \"$line1\""
+	done < src/patches/$1/exclude-patches
+	export excludePatches
+
+	while IFS= read -r line1; do
+ 		green_log "[+] Included: $line1"
+		includePatches+=" -e \"$line1\""
+	done < src/patches/$1/include-patches
+	export includePatches
+}
+
 #################################################
 
 # Find version supported:
