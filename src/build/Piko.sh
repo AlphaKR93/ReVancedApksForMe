@@ -17,11 +17,16 @@ dl_gh "twifucker" "dr-tsng" "latest"
 get_patches_key "com.twitter.android"
 get_apk "twitter" "twitter" "x-corp/twitter/twitter"
 patch "twitter" "piko"
-java -jar jar-*-release.jar ./release/twitter-piko.apk -m TwiFucker-V*.apk -o ./release -f -r
-
 #################################################
 
 # Change Package Name:
 get_patches_keys "all"
 dl_gh "revanced-patches revanced-integrations revanced-cli" "revanced" "prerelease"
-patch "twitter" "piko"
+patch "../release/twitter-piko" ""
+
+#################################################
+
+# Inject LSPosed:
+java -jar jar-*-release.jar ./release/twitter-piko.apk -m TwiFucker-V*.apk -o ./release -f -r
+
+#################################################
