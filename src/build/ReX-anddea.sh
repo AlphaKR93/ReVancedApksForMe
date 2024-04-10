@@ -15,8 +15,8 @@ dl_gh "lspatch" "lsposed" "latest"
 # Patch YouTube ReX:
 get_patches_key "com.google.android.youtube"
 [ -z $3 ] && get_ver "Hide general ads" "com.google.android.youtube"
-get_apk "youtube" "youtube" "google-inc/youtube/youtube"
+dl_apk "youtube" "youtube" "google-inc/youtube/youtube"
 patch "youtube" "ReX-anddea" "inotia"
-inject_lspatch "youtube" "ReX-anddea"
+inject "youtube" "ReX-anddea"
 
 #################################################
