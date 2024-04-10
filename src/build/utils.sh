@@ -13,6 +13,8 @@ _done()    { debug "Done."; }
 debug() { [ "$DEBUG" == "true" ] && echo -e "\e[90m[#] $1\e[0m"; }
 verbose() { [ "$VERBOSE" == "true" ] && $1 "$2"; }
 
+verbose success "Verbose enabled"
+
 # Purge
 unvar() { for var in $1; do verbose info "Cleaning variables: $var"; unset $var; done }
 purge() { for file in $1; do verbose info "Purging files: $file"; rm -rf $file; done }
@@ -135,10 +137,11 @@ dl_gh() {
 get_patches_key() {
 	info "Reading patches info..."
 	patches=() excludePatches=() includePatches=(); local patch name
+	exist "revanced-cli-*.jar revanced-patches-*.jar src/patches/$1/exclude-patches"
 
 	info "Reading patches info..."
 	patches=$(java -jar revanced-cli-*.jar list-patches revanced-patches-*.jar -f $1 | grep Name | cut -d " " -f 2-)
-	debug "Response is: $paatches"
+	debug "Response is: $patches"
 
 	if [ "$2" == "-" ]; then
 		verbose info "Reading included patches..."
@@ -153,10 +156,10 @@ get_patches_key() {
 
 		verbose info "Processing excluded patches..."
 		for patch in ${patches// /_}; do
-			debug "Processing: $patch"
-			[[ $includePatches =~ $patch ]] && continue
-
 			name=${patch//_/ }
+			debug "Processing: $name"
+			[[ $includePatches =~ $name ]] && continue
+
 			warn "Excluded: $name"
 			excludePatches+=" -e \"${name//\"/\\\"}\""
 		done
@@ -175,10 +178,10 @@ get_patches_key() {
 
 	verbose info "Processing included patches..."
 	for patch in ${patches// /_}; do
-		debug "Processing: $patch"
-		[[ $excludePatches =~ $patch ]] && continue
-
 		name=${patch//_/ }
+		debug "Processing: $name"
+		[[ $excludePatches =~ $name ]] && continue
+
 		success "Included: $name"
 		includePatches+=" -i \"${name//\"/\\\"}\""
 	done
@@ -235,7 +238,8 @@ dl_apk() {
 
 	list_vers=$(_req "https://www.apkmirror.com/uploads/?appcategory=$2" -); debug "Response is: $list_vers"
 	version=$(sed -n 's;.*Version:</span><span class="infoSlide-value">\(.*\) </span>.*;\1;p' <<< "$list_vers"); debug "Processed as: $version"
-	for v in $version; do versions+=("$v"); done
+	for v in $version; do versions=(${versions[@]} $v); done
+	verbose info "Found versions: ${versions[@]}"
 
 	while [ $attempt -lt 10 ]; do
 		version=$(echo -e "$versions" | sed -n "$((attempt + 1))p")
@@ -273,15 +277,15 @@ patch() {
 	info "Attempting to patch $1..."
 	exist "revanced-cli-*.jar revanced-patches-*.jar ./download/$1.apk"
 
-	local num=0 patch="patch " bundle="--patch-bundle" merge="--merge" ks="_ks" purge="--purge=true" as=""
+	local num=0 patch="patch " bundle="--patch-bundle" merge="--merge" ks="_ks" purge="--purge=true" dir="./download/$1.apk"
 
-	if [ "$3" = inotia ]; then
+	if [ "$3" == "inotia" ]; then
 		log "Patching with ReVanced-CLI by inotia"
 	elif [[ $(ls revanced-cli-*.jar) =~ revanced-cli-([0-9]+) ]]; then
 		num=${BASH_REMATCH[1]}
 
 		if [ $num -eq 2 ]; then
-			patch="" bundle="-b" merge="-m" ks="_ks" purge="--clean" as="-a "
+			patch="" bundle="-b" merge="-m" ks="_ks" purge="--clean" dir="./download/ -a $1.apk"
 		elif [ $num -ge 4 ]; then
 			ks="ks"
 		else
@@ -290,6 +294,9 @@ patch() {
 
 		log "Patching with ReVanced-CLI version $num"
 	fi
+
+	[ "$3" == "-" ] && dir=$4
+	[ "$4" == "-" ] && dir=$5
 
 	_eval "java -jar revanced-cli-*.jar $patch
 		$bundle revanced-patches-*.jar
@@ -301,7 +308,7 @@ patch() {
 		--keystore=./src/$ks.keystore
 		$purge
 		--force
-		./download/$as$1.apk"
+		$dir"
 	_done
 }
 

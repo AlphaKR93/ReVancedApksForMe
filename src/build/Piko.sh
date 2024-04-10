@@ -33,8 +33,8 @@ purge "patches.json revanced-patches-*.jar revanced-integrations-*.apk"
 start "Patching Twitter-Piko APK with ReVanced..."
 
 dl_gh "ReVanced-Patches ReVanced-Integrations" "ReVanced" "prerelease"
-get_patches_key "all" -
-patch "twitter" "piko"
+get_patches_key "com.twitter.android" -
+patch "twitter" "piko" - "./release/twitter-piko.apk"
 purge "patches.json revanced-patches-*.jar revanced-integrations-*.apk"
 
 #################################################
