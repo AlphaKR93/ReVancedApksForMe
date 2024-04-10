@@ -163,7 +163,7 @@ get_patches_key() {
 			warn "Excluded: $name"
 			excludePatches+=" -e \"${name//\"/\\\"}\""
 		done
-		unvar "patches"; _done
+		unvar "patches"; _done; return
 	fi
 
 	verbose info "Reading excluded patches..."
