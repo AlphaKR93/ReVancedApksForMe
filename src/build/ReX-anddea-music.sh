@@ -14,8 +14,9 @@ dl_gh "lspatch" "lsposed" "latest"
 
 # Patch YouTube Music ReX:
 get_patches_key "com.google.android.apps.youtube.music"
-if [[ -v 3 ]]; then version=$3; else get_ver "Enable color match player" "com.google.android.apps.youtube.music"; fi
+[ -z $3 ] && get_ver "Enable color match player" "com.google.android.apps.youtube.music"
 get_apk "youtube-music-arm64-v8a" "youtube-music" "google-inc/youtube-music/youtube-music" "arm64-v8a"
 patch "youtube-music-arm64-v8a" "ReX-anddea" "inotia"
+inject_lspatch "youtube-music-arm64-v8a" "ReX-anddea"
 
 #################################################

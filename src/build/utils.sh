@@ -1,134 +1,195 @@
 #!/bin/bash
+VERBOSE=$1 DEBUG=$2 version=$3
 
-mkdir ./release ./download
+# Colorful logs
+log()      { echo -e      "\e[0m$1\e[0m"; }
+error()    { echo -e "\e[31m[!] $1\e[0m"; }
+success()  { echo -e "\e[32m[+] $1\e[0m"; }
+warn()     { echo -e "\e[33m[-] $1\e[0m"; }
+info()     { echo -e "\e[34m[*] $1\e[0m"; }
+start()    { echo -e "\e[35m[&] $1\e[0m"; }
+_log()     { echo -e "\e[96m[@] $1\e[0m"; }
+_done()    { debug "Done."; }
+debug() { [ "$DEBUG" == "true" ] && echo -e "\e[90m[#] $1\e[0m"; }
+verbose() { [ "$VERBOSE" == "true" ] && $1 "$2"; }
 
-#Setup HTMLQ
-wget -q -O ./htmlq.tar.gz https://github.com/mgdm/htmlq/releases/latest/download/htmlq-x86_64-linux.tar.gz
-tar -xf "./htmlq.tar.gz" -C "./"
-HTMLQ="./htmlq" 
+# Purge
+unvar() { for var in $1; do verbose info "Cleaning variables: $var"; unset $var; done }
+purge() { for file in $1; do verbose info "Purging files: $file"; rm -rf $file; done }
+_clear() {
+	info "Purging files and variables..."
+	purge "./download ./htmlq ./htmlq.tar.gz ./patches.json ./*.apk ./*.jar"
+	unvar "version includePatches excludePatches"
+	_done
+}
+
+# Fatal Failure
+fatal() { error "$1, aborting!"; _clear; exit 1; }
+exist() {
+	for file in $1; do
+		[ ! -f "$(ls $file)" ] && fatal "Cannot find $file"
+	done
+}
+
+# Evaluate
+_eval() {
+	local cmd="$(echo "$1" | sed 's/^[[:space:]]*/ /' | tr -d "\n")"
+	log "Running command: $cmd"; eval $cmd;
+}
+
+# WGet
+dl()  { wget -q -O $2 $1; }
+get() { wget -qO- $1; }
 
 #################################################
 
-# Colored output logs
-green_log() {
-    echo -e "\e[32m$1\e[0m"
+# Initializers
+initialize() {
+	_log "Starting patch process..."
+
+	_clear; purge "./release"
+
+	mkdir ./release ./download
+
+	dl https://github.com/mgdm/htmlq/releases/latest/download/htmlq-x86_64-linux.tar.gz htmlq.tar.gz
+	tar -xf "./htmlq.tar.gz" -C "./"; purge "./htmlq.tar.gz"
+
+	_done
 }
-red_log() {
-    echo -e "\e[31m$1\e[0m"
-}
+finalize() { _clear; _log "Done!"; }
 
 #################################################
 
-# Download Github assets requirement:
+# GitHub Releases assets downloader
 dl_gh() {
-	if [ $3 == "latest" ] || [ $3 == "prerelease" ]; then
-		local repo=$1
-		for repo in $1 ; do
-			local owner=$2 tag=$3 found=0 assets=0
-			releases=$(wget -qO- "https://api.github.com/repos/$owner/$repo/releases")
-			while read -r line; do
-				if [[ $line == *"\"tag_name\":"* ]]; then
-					tag_name=$(echo $line | cut -d '"' -f 4)
-					if [ "$tag" == "$tag_name" ] || [ "$tag" == "latest" ] || [ "$tag" == "prerelease" ]; then
-						found=1
-					else
-						found=0
-					fi
-				fi
-				if [[ $line == *"\"prerelease\":"* ]]; then
-					prerelease=$(echo $line | cut -d ' ' -f 2 | tr -d ',')
-					if [ "$tag" == "prerelease" ] && [ "$prerelease" == "false" ]; then
-						found=0
-					elif [ "$tag" == "latest" ] && [ "$prerelease" == "true" ]; then
-						found=0
-					fi
-				fi
-				if [[ $line == *"\"assets\":"* ]]; then
-					if [ $found -eq 1 ]; then
-						assets=1
-					fi
-				fi
-				if [[ $line == *"\"browser_download_url\":"* ]]; then
-					if [ $assets -eq 1 ]; then
-						url=$(echo $line | cut -d '"' -f 4)
-							if [[ $url != *.asc ]]; then
-							name=$(basename "$url")
-							wget -q -O "$name" "$url"
-							green_log "[+] Downloading $name from $owner"
-						fi
-					fi
-				fi
-				if [[ $line == *"],"* ]]; then
-					if [ $assets -eq 1 ]; then
-						assets=0
-						break
-					fi
-				fi
-			done <<< "$releases"
-		done
-	else
-		for repo in $1 ; do
-			wget -qO- "https://api.github.com/repos/$2/$repo/releases/tags/$3" \
-			| jq -r '.assets[] | "\(.browser_download_url) \(.name)"' \
-			| while read -r url names; do
-				green_log "[+] Downloading $names from $2"
-				wget -q -O "$names" $url
-			done
-		done
+	local owner=$2 tag=$3
+
+	# Process custom tags
+	if [ $tag != "latest" ] && [ $tag != "prerelease" ]; then
+		for repo in $1; do
+			verbose info "Attempting to download assets from $owner/$repo..."
+			while read -r url names; do
+				verbose info "Downloading $names from $owner..."
+				dl "$url" "$names"
+				success "Successfully downloaded $names from $owner!"
+			done <<< "$(get "https://api.github.com/repos/$owner/$repo/releases/tags/$tag" \
+				| jq -r '.assets[] | "\(.browser_download_url) \(.name)"')"
+		done; _done; return
 	fi
+
+	# Process latest/prerelease
+	for repo in $1; do
+		verbose info "Attempting to download assets from $owner/$repo..."
+
+		local found=0 assets=0 prerelease="false" url="" name="" releases=$(get "https://api.github.com/repos/$owner/$repo/releases")
+
+		debug "Response is: $releases"
+
+		while read -r line; do
+
+			debug "Processing: $line"
+
+			# Process "tag_name"
+			if [[ "$line" =~ "\"tag_name\":" ]]; then
+				if [ "$tag" == "$(echo $line | cut -d "\"" -f 4)" ]; then
+					found=1
+				elif [ "$tag" == "latest" ] || [ "$tag" == "prerelease" ]; then
+					found=1
+				fi
+			fi
+
+			# Process "prerelease"
+			if [[ "$line" =~ "\"prerelease\":" ]]; then
+				prerelease=$(echo $line | cut -d ' ' -f 2 | tr -d ',')
+				if [ "$tag" == "prerelease" ] && [ "$prerelease" == "false" ]; then
+					found=0
+				elif [ "$tag" == "latest" ] && [ "$prerelease" == "true" ]; then
+					found=0
+				fi
+			fi
+
+			# Check response has assets
+			[[ "$line" =~ *"\"assets\":"* ]] && [ $found -eq 1 ] && assets=1
+			[ ! $assets -ne 1 ] && continue
+
+			# Download assets
+			if [[ "$line" =~ "\"browser_download_url\":" ]]; then
+				url=$(echo $line | cut -d '"' -f 4)
+				if [[ ! "$url" =~ ".asc" ]]; then
+					name=$(basename "$url")
+					verbose info "Downloading $name from $owner/$repo"
+					dl "$url" "$name"
+					success "Successfully downloaded $name from $owner/$repo!"
+				fi
+			fi
+
+			if [[ "$line" =~ "]," ]]; then assets=0 && break; fi
+
+		done <<< "$releases"
+	done; _done
 }
 
 #################################################
 
 # Get patches list:
 get_patches_key() {
-	excludePatches=""
-	includePatches=""
-	while IFS= read -r line1; do
- 		red_log "[-] Excluded: $line1"
-		excludePatches+=" -e \"$line1\""
-	done < src/patches/$1/exclude-patches
-	export excludePatches
+	info "Reading patches info..."
+	patches=() excludePatches=() includePatches=(); local patch name
 
-	exclude=$(cat src/patches/$1/exclude-patches)
+	info "Reading patches info..."
 	patches=$(java -jar revanced-cli-*.jar list-patches revanced-patches-*.jar -f $1 | grep Name | cut -d " " -f 2-)
-        for patch in ${patches// /_}; do
-		rv=${patch//_/ }
-		if ! grep -q "$rv" src/patches/$1/exclude-patches; then
-			green_log "[+] Included: $rv"
-			includePatches+=" -i \"${rv//"\""/"\\\""}\""
+	debug "Response is: $paatches"
+
+	if [ "$2" == "-" ]; then
+		verbose info "Reading included patches..."
+		while IFS= read -r patch; do
+			debug "Processing: $patch"
+			if [[ $patches =~ $patch ]]; then
+				success "Included: $patch"; includePatches+=" -e \"${patch//\"/\\\"}\""
+			else
+				error "Cannot find $patch in patches list!"
+			fi
+		done < src/patches/$1/include-patches
+
+		verbose info "Processing excluded patches..."
+		for patch in ${patches// /_}; do
+			debug "Processing: $patch"
+			[[ $includePatches =~ $patch ]] && continue
+
+			name=${patch//_/ }
+			warn "Excluded: $name"
+			excludePatches+=" -i \"${name//\"/\\\"}\""
+		done
+		unvar "patches"; _done
+	fi
+
+	verbose info "Reading excluded patches..."
+	while IFS= read -r patch; do
+		debug "Processing: $patch"
+		if [[ $patches =~ $patch ]]; then
+			warn "Excluded: $patch"; excludePatches+=" -e \"${patch//\"/\\\"}\""
+		else
+			error "Cannot find $patch in patches list!"
 		fi
-	done
-	export includePatches
-}
-
-get_patches_keys() {
-	excludePatches=""
-	includePatches=""
-	while IFS= read -r line1; do
- 		red_log "[-] Excluded: $line1"
-		excludePatches+=" -e \"$line1\""
 	done < src/patches/$1/exclude-patches
-	export excludePatches
 
-	while IFS= read -r line1; do
- 		green_log "[+] Included: $line1"
-		includePatches+=" -e \"$line1\""
-	done < src/patches/$1/include-patches
-	export includePatches
+	verbose info "Processing included patches..."
+	for patch in ${patches// /_}; do
+		debug "Processing: $patch"
+		[[ $excludePatches =~ $patch ]] && continue
+
+		name=${patch//_/ }
+		success "Included: $name"
+		includePatches+=" -i \"${name//\"/\\\"}\""
+	done
+	unvar "patches"; _done; return
 }
 
 #################################################
 
 # Find version supported:
 get_ver() {
-	version=$(jq -r --arg patch_name "$1" --arg pkg_name "$2" '
-	.[]
-	| select(.name == $patch_name)
-	| .compatiblePackages[]
-	| select(.name == $pkg_name)
-	| .versions[-1]
-	' patches.json)
+	version=$(jq -r --arg patch_name "$1" --arg pkg_name "$2" '.[] | select(.name == $patch_name) | .compatiblePackages[] | select(.name == $pkg_name) | .versions[-1]' patches.json)
  	[ "$version" == "null" ] && version=""
 }
 
@@ -136,167 +197,133 @@ get_ver() {
 
 # Download apks files from APKMirror:
 _req() {
-    if [ "$2" = "-" ]; then
-        wget -nv -O "$2" --header="$3" "$1" || rm -f "$2"
+	local header="User-Agent: Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.231 Mobile Safari/537.36"
+
+    if [ "$2" == "-" ]; then
+        wget -nv -O "$2" --header="$header" "$1" || rm -f "$2"
     else
-        wget -nv -O "./download/$2" --header="$3" "$1" || rm -f "./download/$2"
+        wget -nv -O "./download/$2" --header="$header" "$1" || rm -f "./download/$2"
     fi
 }
-req() {
-    _req "$1" "$2" "User-Agent: Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.231 Mobile Safari/537.36"
+
+_dl_apk() {
+	local url=$1 regexp=$2 output=$3 htmlq="./htmlq"
+
+	url="https://www.apkmirror.com$(_req "$url" - | tr '\n' ' ' | sed -n "s/href=\"/@/g; s;.*${regexp}.*;\1;p")"
+	sleep 5
+
+	url="https://www.apkmirror.com$(_req "$url" - | grep "downloadButton" | sed -n 's;.*href="\(.*key=[^"]*\)">.*;\1;p')"
+	sleep 5
+
+   	url=$(_req "$url" - | $htmlq --base https://www.apkmirror.com --attribute href "span > a[rel = nofollow]")
+	sleep 5
+
+	_req "$url" "$output"
 }
 
 dl_apk() {
-	local url=$1 regexp=$2 output=$3
-	url="https://www.apkmirror.com$(req "$url" - | tr '\n' ' ' | sed -n "s/href=\"/@/g; s;.*${regexp}.*;\1;p")"
-	sleep 5
-	url="https://www.apkmirror.com$(req "$url" - | grep "downloadButton" | sed -n 's;.*href="\(.*key=[^"]*\)">.*;\1;p')"
-	sleep 5
-   	url=$(req "$url" - | $HTMLQ --base https://www.apkmirror.com --attribute href "span > a[rel = nofollow]")
-	sleep 5
-	req "$url" "$output"
-}
-get_apk() {
-	if [[ -z $4 ]]; then
-		url_regexp='APK</span>[^@]*@\([^#]*\)'
-	else
-		case $4 in
-			arm64-v8a) url_regexp='arm64-v8a'"[^@]*$6"''"[^@]*$5"'</div>[^@]*@\([^"]*\)' ;;
-			armeabi-v7a) url_regexp='armeabi-v7a'"[^@]*$6"''"[^@]*$5"'</div>[^@]*@\([^"]*\)' ;;
-			x86) url_regexp='x86'"[^@]*$6"''"[^@]*$5"'</div>[^@]*@\([^"]*\)' ;;
-			x86_64) url_regexp='x86_64'"[^@]*$6"''"[^@]*$5"'</div>[^@]*@\([^"]*\)' ;;
-			*) url_regexp='$4'"[^@]*$6"''"[^@]*$5"'</div>[^@]*@\([^"]*\)' ;;
-		esac 
-	fi
-	export version="$version"
-	local attempt=0
+	verbose info "Attempting to download $2..."
+	local base_apk="$1.apk" attempt=0 list_vers=() versions=() url_regexp='APK</span>[^@]*@\([^#]*\)'
+
+	if [ ! -z $4 ]; then case $4 in
+		arm64-v8a) url_regexp='arm64-v8a'"[^@]*$6"''"[^@]*$5"'</div>[^@]*@\([^"]*\)' ;;
+		armeabi-v7a) url_regexp='armeabi-v7a'"[^@]*$6"''"[^@]*$5"'</div>[^@]*@\([^"]*\)' ;;
+		x86) url_regexp='x86'"[^@]*$6"''"[^@]*$5"'</div>[^@]*@\([^"]*\)' ;;
+		x86_64) url_regexp='x86_64'"[^@]*$6"''"[^@]*$5"'</div>[^@]*@\([^"]*\)' ;;
+		*) url_regexp='$4'"[^@]*$6"''"[^@]*$5"'</div>[^@]*@\([^"]*\)' ;;
+	esac; fi
+
+	list_vers=$(_req "https://www.apkmirror.com/uploads/?appcategory=$2" -); debug "Response is: $list_vers"
+	version=$(sed -n 's;.*Version:</span><span class="infoSlide-value">\(.*\) </span>.*;\1;p' <<< "$list_vers"); debug "Processed as: $version"
+	for v in $version; do versions+=("$v"); done
+
 	while [ $attempt -lt 10 ]; do
-		if [[ -z $version ]] || [ $attempt -ne 0 ]; then
-			local list_vers v versions=()
-			list_vers=$(req "https://www.apkmirror.com/uploads/?appcategory=$2" -)
-			version=$(sed -n 's;.*Version:</span><span class="infoSlide-value">\(.*\) </span>.*;\1;p' <<<"$list_vers")
-			version=$(grep -iv "\(beta\|alpha\)" <<<"$version")
-			for v in $version; do
-				grep -iq "${v} \(beta\|alpha\)" <<<"$list_vers" || versions+=("$v")
-			done
-			version=$(echo -e "$version" | sed -n "$((attempt + 1))p")
-		fi
-		green_log "[+] Downloading $2 version: $version $4 $5 $6"
-		local base_apk="$1.apk"
-		local dl_url=$(dl_apk "https://www.apkmirror.com/apk/$3-${version//./-}-release/" \
-							  "$url_regexp" \
-							  "$base_apk")
-		if [[ -f "./download/$1.apk" ]]; then
-			green_log "[+] Successfully downloaded $1"
-			break
-		else
-			((attempt++))
-			red_log "[-] Failed to download $1, trying another version"
-			unset version list_vers v versions
-		fi
+		version=$(echo -e "$versions" | sed -n "$((attempt + 1))p")
+		verbose info "Downloading $2 (version: $version, arch: $4, dpi: $5, android: $6)"
+		local dl_url=$(_dl_apk "https://www.apkmirror.com/apk/$3-${version//./-}-release/" "$url_regexp" "$base_apk")
+
+		[ -f "./download/$1.apk" ] && success "Successfully downloaded $2!" && break
+
+		warn "Failed to download $1, trying another version..."
+		((attempt++)); unvar version
 	done
-	if [ $attempt -eq 10 ]; then
-		red_log "[-] No more versions to try. Failed download"
-		return 1
-	fi
+
+	[ $attempt -eq 10 ] && fatal "No more versions to try"
+	[ ! -f "./download/$1.apk" ] && fatal "Failed to download $1"
+
+	_done
+}
+
+#################################################
+
+# Merge APKs
+merge() {
+	info "Merging $1..."
+	exist "./download/$1-bundled.apk APKEditor-*.jar"
+	_eval "java -jar APKEditor-*.jar merge
+		-i download/$1-bundled.apk
+		-o download/$1.apk"
+	_done
 }
 
 #################################################
 
 # Patching apps with Revanced CLI:
 patch() {
-	green_log "[+] Patching $1:"
-	if [ -f "./download/$1.apk" ]; then
-		local p b m ks a pu
-		if [ "$3" = inotia ]; then
-			p="patch " b="--patch-bundle" m="--merge" a="" ks="_ks"
-			echo "Patching with Revanced-cli inotia"
+	info "Attempting to patch $1..."
+	exist "revanced-cli-*.jar revanced-patches-*.jar ./download/$1.apk"
+
+	local num=0 patch="patch " bundle="--patch-bundle" merge="--merge" ks="_ks" purge="--purge=true" as=""
+
+	if [ "$3" = inotia ]; then
+		log "Patching with ReVanced-CLI by inotia"
+	elif [[ $(ls revanced-cli-*.jar) =~ revanced-cli-([0-9]+) ]]; then
+		num=${BASH_REMATCH[1]}
+
+		if [ $num -eq 2 ]; then
+			patch="" bundle="-b" merge="-m" ks="_ks" purge="--clean" as="-a "
+		elif [ $num -ge 4 ]; then
+			ks="ks"
 		else
-			if [[ $(ls revanced-cli-*.jar) =~ revanced-cli-([0-9]+) ]]; then
-				num=${BASH_REMATCH[1]}
-				if [ $num -ge 4 ]; then
-					p="patch " b="--patch-bundle" m="--merge" a="" ks="ks" pu="--purge=true"
-					echo "Patching with Revanced-cli version 4+"
-				elif [ $num -eq 3 ]; then
-					p="patch " b="--patch-bundle" m="--merge" a="" ks="_ks" pu="--purge=true"
-					echo "Patching with Revanced-cli version 3"
-				elif [ $num -eq 2 ]; then
-					p="" b="-b" m="-m" a="-a " ks="_ks" pu="--clean"
-					echo "Patching with Revanced-cli version 2"
-				fi
-			fi
+			fatal "Unsupported ReVanced-CLI version: $num"
 		fi
-        echo "The command line is: java -jar revanced-cli****.jar $p $b revanced-patches****.jar $m revanced-integrations****.apk $excludePatches $includePatches --options=./src/options/$2.json --out=./release/$1-$2.apk --keystore=./src/$ks.keystore $pu --force ./download/$a$1.apk"
-		eval java -jar revanced-cli*.jar $p \
-			$b revanced-patches*.jar \
-			$m revanced-integrations*.apk \
-			$excludePatches \
-			$includePatches \
-			--options=./src/options/$2.json \
-			--out=./release/$1-$2.apk \
-			--keystore=./src/$ks.keystore \
-			$pu \
-            --force \
-			./download/$a$1.apk
-    eval java -jar jar-*-release.jar ./release/*.apk -o ./release -f -r
-  	unset version
-		unset excludePatches
-		unset includePatches
-	else
-		red_log "[-] Not found $1.apk"
-		exit 1
+
+		log "Patching with ReVanced-CLI version $num"
 	fi
+
+	_eval "java -jar revanced-cli-*.jar $patch
+		$bundle revanced-patches-*.jar
+		$merge revanced-integrations-*.apk
+		$excludePatches
+		$includePatches
+		--options=./src/options/$2.json
+		--out=./release/$1-$2.apk
+		--keystore=./src/$ks.keystore
+		$purge
+		--force
+		./download/$as$1.apk"
+	_done
 }
 
 #################################################
 
-# Split architectures using Revanced CLI, created by j-hc or inotia00
-archs=("arm64-v8a" "armeabi-v7a" "x86_64" "x86")
-libs=("lib/armeabi-v7a lib/x86_64 lib/x86" "lib/arm64-v8a lib/x86_64 lib/x86" "lib/armeabi-v7a lib/arm64-v8a lib/x86" "lib/armeabi-v7a lib/arm64-v8a lib/x86_64")
-gen_rip_libs() {
-	for lib in $@; do
-		echo -n "--rip-lib "$lib" "
-	done
-}
-split_arch() {
-	green_log "[+] Splitting $1 to ${archs[i]}:"
-	if [ -f "./download/$1.apk" ]; then
-		eval java -jar revanced-cli*.jar patch \
-		--patch-bundle revanced-patches*.jar \
-		--merge revanced-integrations*.apk\
-		$excludePatches\
-		$includePatches \
-		--rip-lib res \
-		--rip-lib classes \
-		$3\
-		--options=./src/options/$2.json \
-		--keystore=./src/_ks.keystore \
-		--out=./release/$2.apk\
-		./download/$1.apk
-	else
-		red_log "[-] Not found $1.apk"
-		exit 1
-	fi
-}
-_libs=("armeabi-v7a x86_64 x86" "arm64-v8a x86_64 x86" "armeabi-v7a arm64-v8a x86" "armeabi-v7a arm64-v8a x86_64")
-_gen_rip_libs() {
-	for lib in $@; do
-		echo -n "--rip-lib "$lib" "
-	done
-}
-_split_arch() {
-	green_log "[+] Splitting $1 to ${archs[i]}:"
-	if [ -f "./release/$1.apk" ]; then
-		eval java -jar revanced-cli*.jar patch \
-		--patch-bundle revanced-patches*.jar \
-		$3 \
-		--keystore=./src/_ks.keystore \
-		--out=./release/$2.apk\
-		./release/$1.apk
-	else
-		red_log "[-] Not found $1.apk"
-		exit 1
-	fi
+# Inject LSPatch:
+inject() {
+	info "Injecting LSPatch to $1..."
+	exist "jar-*.jar ./release/$1-$2.apk"
+
+	local m=""
+	[ ! -z $3 ] && m="--embed $3"
+
+	_eval "java -jar jar-*-release.jar
+		./release/$1-$2.apk
+		--output ./release
+		--allowdown
+		--force
+		--verbose
+		$m"
+	mv ./release/$1-$2-*-lspatched.apk ./release/$1-$2.apk -f
+	_done
 }
 
 #################################################

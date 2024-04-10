@@ -21,6 +21,16 @@ on:
           - 'Rex-anddea-beta-yt'
           - 'Rex-anddea-beta-music'
           - 'Twitter Piko Beta'
+      verbose:
+        description: 'Enable verbose mode?'
+        required: true
+        default: 'false'
+        type: boolean
+      debug:
+        description: 'Enable debug mode?'
+        required: true
+        default: 'false'
+        type: boolean
       retry_count:
         description: 'Do not change value below'
         required: false
@@ -33,40 +43,44 @@ on:
         description: "ReVanced YT Music Version"
         required: false
         default: ''
+      twitter:
+        description: "Twitter Piko Version"
+        required: false
+        default: ''
   workflow_call:
     inputs:
       org:
         required: true
         type: string
 jobs:
-  patch_rv_beta:
-    name: Patch Revanced Beta
-    if: ${{ github.event.inputs.org == 'Revanced Beta' || inputs.org == 'Revanced Beta' }}
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        Include:
-          - org: "Revanced-Beta"
-            run: "A"
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4.1.1
-      - name: Preparing to patch
-        uses: ./.github/actions/preparing
-      - name: Check github connection
-        id: check-gh-rvb
-        run: bash src/etc/connection.sh
-      - name: Patch apk
-        id: patch-rvb
-        if: steps.check-gh-rvb.outputs.internet_error == '0'
-        run: bash src/build/Revanced-${{ matrix.Include.run }}.sh
-      - name: Releasing APK files
-        id: release-rvb
-        if: steps.check-gh-rvb.outputs.internet_error == '0'
-        uses: ./.github/actions/release
-      - name: Re-run workflow if github connection not stable
-        if: always() && steps.patch-rvb.outcome == 'skipped' || steps.release-rvb.outcome == 'skipped' && env.retry_count < env.max_retries && matrix.Include.run == '1'
-        uses: ./.github/actions/re-run
+  # patch_rv_beta:
+  #   name: Patch Revanced Beta
+  #   if: ${{ github.event.inputs.org == 'Revanced Beta' || inputs.org == 'Revanced Beta' }}
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       Include:
+  #         - org: "Revanced-Beta"
+  #           run: "A"
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4.1.1
+  #     - name: Preparing to patch
+  #       uses: ./.github/actions/preparing
+  #     - name: Check github connection
+  #       id: check-gh-rvb
+  #       run: bash src/etc/connection.sh
+  #     - name: Patch apk
+  #       id: patch-rvb
+  #       if: steps.check-gh-rvb.outputs.internet_error == '0'
+  #       run: bash src/build/Revanced-${{ matrix.Include.run }}.sh
+  #     - name: Releasing APK files
+  #       id: release-rvb
+  #       if: steps.check-gh-rvb.outputs.internet_error == '0'
+  #       uses: ./.github/actions/release
+  #     - name: Re-run workflow if github connection not stable
+  #       if: always() && steps.patch-rvb.outcome == 'skipped' || steps.release-rvb.outcome == 'skipped' && env.retry_count < env.max_retries && matrix.Include.run == '1'
+  #       uses: ./.github/actions/re-run
   patch_rex_anddea_beta:
     name: Patch ReX forked by anddea beta
     if: ${{ github.event.inputs.org == 'ReX-anddea-beta' || github.event.inputs.org == 'ReX-anddea-beta-yt' || github.event.inputs.org == 'All' || inputs.org == 'ReX-anddea-beta' }}
@@ -82,7 +96,7 @@ jobs:
       - name: Patch apk
         id: patch-rex-anddea-beta
         if: steps.check-gh-rex-anddea-beta.outputs.internet_error == '0'
-        run: bash src/build/ReX-anddea.sh prerelease ${{ github.event.inputs.rex }} ${{ github.event.inputs.rexm }}
+        run: bash src/build/ReX-anddea.sh ${{ github.event.inputs.verbose }} ${{ github.event.inputs.debug }} ${{ github.event.inputs.rex }}}
       - name: Releasing APK files
         id: release-rex-anddea-beta
         if: steps.check-gh-rex-anddea-beta.outputs.internet_error == '0'
@@ -105,7 +119,7 @@ jobs:
       - name: Patch apk
         id: patch-rex-anddea-beta
         if: steps.check-gh-rex-anddea-beta.outputs.internet_error == '0'
-        run: bash src/build/ReX-anddea-music.sh prerelease ${{ github.event.inputs.rex }} ${{ github.event.inputs.rexm }}
+        run: bash src/build/ReX-anddea-music.sh ${{ github.event.inputs.verbose }} ${{ github.event.inputs.debug }} ${{ github.event.inputs.rexm }}
       - name: Releasing APK files
         id: release-rex-anddea-beta
         if: steps.check-gh-rex-anddea-beta.outputs.internet_error == '0'
@@ -128,7 +142,7 @@ jobs:
       - name: Patch apk
         id: patch-piko-beta
         if: steps.check-gh-piko-beta.outputs.internet_error == '0'
-        run: bash src/build/Piko.sh prerelease
+        run: bash src/build/Piko.sh ${{ github.event.inputs.verbose }} ${{ github.event.inputs.debug }} ${{ github.event.inputs.twitter }}
       - name: Releasing APK files
         id: release-piko-beta
         if: steps.check-gh-piko-beta.outputs.internet_error == '0'

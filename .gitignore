@@ -1,0 +1,8 @@
+patches.json
+download/
+release/
+htmlq
+
+*.jar
+*.apk
+*.gz
