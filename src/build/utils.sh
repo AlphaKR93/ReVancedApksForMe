@@ -145,7 +145,7 @@ get_patches_key() {
 		while IFS= read -r patch; do
 			debug "Processing: $patch"
 			if [[ $patches =~ $patch ]]; then
-				success "Included: $patch"; includePatches+=" -e \"${patch//\"/\\\"}\""
+				success "Included: $patch"; includePatches+=" -i \"${patch//\"/\\\"}\""
 			else
 				error "Cannot find $patch in patches list!"
 			fi
@@ -158,7 +158,7 @@ get_patches_key() {
 
 			name=${patch//_/ }
 			warn "Excluded: $name"
-			excludePatches+=" -i \"${name//\"/\\\"}\""
+			excludePatches+=" -e \"${name//\"/\\\"}\""
 		done
 		unvar "patches"; _done
 	fi
