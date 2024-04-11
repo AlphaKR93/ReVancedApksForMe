@@ -21,7 +21,7 @@ purge "patches.json revanced-integrations-*.apk revanced-patches-*.jar revanced-
 
 start "Patching ReX Music APK with ReVanced..."
 
-dl_gh "ReVanced-Patches ReVanced-Integrations" "ReVanced" "prerelease"
+dl_gh "ReVanced-Patches ReVanced-Integrations ReVanced-CLI" "ReVanced" "prerelease"
 get_patches_key "com.google.android.apps.youtube.music" -
 patch "rex-music" "anddea" - "./release/rex-music-anddea.apk"
 purge "patches.json revanced-patches-*.jar revanced-integrations-*.apk"
