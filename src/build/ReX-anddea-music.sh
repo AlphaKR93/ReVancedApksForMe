@@ -1,7 +1,7 @@
 #!/bin/bash
-
-# ReX build
 source src/build/utils.sh
+
+initialize
 
 #################################################
 
@@ -20,3 +20,5 @@ patch "youtube-music-arm64-v8a" "ReX-anddea" "inotia"
 inject "youtube-music-arm64-v8a" "ReX-anddea"
 
 #################################################
+
+finalize
