@@ -28,7 +28,7 @@ jobs:
       - name: Check new patch ReX forked by anddea beta
         id: check-rex-anddea-beta
         if: steps.check-gh.outputs.internet_error == '0'
-        run: bash src/etc/ci.sh anddea/revanced-patches prerelease youtube-ReX-anddea.apk
+        run: bash src/etc/ci.sh anddea/revanced-patches prerelease rex-anddea.apk
       - name: Check new patch Twitter Piko Beta
         id: check-twitter-piko-beta
         if: steps.check-gh.outputs.internet_error == '0'
