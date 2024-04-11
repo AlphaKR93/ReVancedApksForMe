@@ -1,5 +1,5 @@
 #!/bin/bash
-VERBOSE=$1 DEBUG=$2
+VERBOSE=$1 DEBUG=$2 version=$3
 
 # Colorful logs
 log()      { echo -e      "\e[0m$1\e[0m"; }
@@ -21,7 +21,7 @@ purge() { for file in $1; do verbose info "Purging files: $file"; rm -rf $file; 
 _clear() {
 	info "Purging files and variables..."
 	purge "./download ./htmlq ./htmlq.tar.gz ./patches.json ./*.apk ./*.jar"
-	unvar "version includePatches excludePatches"
+	unvar "includePatches excludePatches"
 	_done
 }
 
