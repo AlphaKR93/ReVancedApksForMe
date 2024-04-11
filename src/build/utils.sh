@@ -9,9 +9,9 @@ warn()     { echo -e "\e[33m[-] $1\e[0m"; }
 info()     { echo -e "\e[34m[*] $1\e[0m"; }
 start()    { echo -e "\e[35m[&] $1\e[0m"; }
 _log()     { echo -e "\e[96m[@] $1\e[0m"; }
+debug()    { [ "$DEBUG" == "true" ] && echo -e "\e[90m[#] $1\e[0m"; }
+verbose()  { [ "$VERBOSE" == "true" ] && $1 "$2"; }
 _done()    { debug "Done."; }
-debug() { [ "$DEBUG" == "true" ] && echo -e "\e[90m[#] $1\e[0m"; }
-verbose() { [ "$VERBOSE" == "true" ] && $1 "$2"; }
 
 verbose success "Verbose enabled"
 
@@ -236,10 +236,12 @@ dl_apk() {
 		*) url_regexp='$4'"[^@]*$6"''"[^@]*$5"'</div>[^@]*@\([^"]*\)' ;;
 	esac; fi
 
-	list_vers=$(_req "https://www.apkmirror.com/uploads/?appcategory=$2" -); debug "Response is: $list_vers"
-	version=$(sed -n 's;.*Version:</span><span class="infoSlide-value">\(.*\) </span>.*;\1;p' <<< "$list_vers"); debug "Processed as: $version"
-	for v in $version; do versions=(${versions[@]} $v); done
-	verbose info "Found versions: ${versions[@]}"
+        if [ ! -z $version ]; then
+		list_vers=$(_req "https://www.apkmirror.com/uploads/?appcategory=$2" -); debug "Response is: $list_vers"
+         	version=$(sed -n 's;.*Version:</span><span class="infoSlide-value">\(.*\) </span>.*;\1;p' <<< "$list_vers"); debug "Processed as: $version"
+		for v in $version; do versions=(${versions[@]} $v); done
+		verbose info "Found versions: ${versions[@]}"
+  	fi
 
 	while [ $attempt -lt 10 ]; do
 		version=$(echo -e "$versions" | sed -n "$((attempt + 1))p")
