@@ -21,7 +21,7 @@ purge "patches.json revanced-integrations-*.apk revanced-patches-*.jar revanced-
 
 start "Patching RVX Extended APK with ReVanced..."
 
-dl_gh "ReVanced-Patches ReVanced-Integrations" "ReVanced" "prerelease"
+dl_gh "ReVanced-Patches ReVanced-Integrations ReVanced-CLI" "ReVanced" "prerelease"
 get_patches_key "com.google.android.youtube" -
 patch "rex" "anddea" - "./release/rex-anddea.apk"
 purge "patches.json revanced-patches-*.jar revanced-integrations-*.apk"
