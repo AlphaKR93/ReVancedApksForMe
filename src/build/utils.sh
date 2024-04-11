@@ -244,7 +244,7 @@ dl_apk() {
   	fi
 
 	while [ $attempt -lt 10 ]; do
-		[ -z $version ] && version=$(echo -e "$versions" | sed -n "$((attempt + 1))p")
+		[ ! -z $version ] && version=$(echo -e "$versions" | sed -n "$((attempt + 1))p")
 		verbose info "Downloading $2 (version: $version, arch: $4, dpi: $5, android: $6)"
 		local dl_url=$(_dl_apk "https://www.apkmirror.com/apk/$3-${version//./-}-release/" "$url_regexp" "$base_apk")
 
