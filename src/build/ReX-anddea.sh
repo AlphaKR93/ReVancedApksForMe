@@ -15,6 +15,7 @@ get_patches_key "com.google.android.youtube"
 
 dl_apk "rex" "youtube" "google-inc/youtube/youtube"
 patch "rex" "anddea" "inotia"
+purge "patches.json revanced-integrations-*.apk revanced-patches-*.jar revanced-cli-*.jar"
 
 #################################################
 
