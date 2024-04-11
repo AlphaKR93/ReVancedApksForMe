@@ -96,7 +96,7 @@ jobs:
       - name: Patch apk
         id: patch-rex-anddea-beta
         if: steps.check-gh-rex-anddea-beta.outputs.internet_error == '0'
-        run: bash src/build/ReX-anddea.sh ${{ github.event.inputs.verbose }} ${{ github.event.inputs.debug }} ${{ github.event.inputs.rex }}}
+        run: bash src/build/ReX-anddea.sh ${{ github.event.inputs.verbose }} ${{ github.event.inputs.debug }} ${{ github.event.inputs.rex }}
       - name: Releasing APK files
         id: release-rex-anddea-beta
         if: steps.check-gh-rex-anddea-beta.outputs.internet_error == '0'
