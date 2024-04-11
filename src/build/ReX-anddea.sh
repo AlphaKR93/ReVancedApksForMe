@@ -1,7 +1,7 @@
 #!/bin/bash
-
-# ReX build
 source src/build/utils.sh
+
+initialize
 
 #################################################
 
@@ -20,3 +20,5 @@ patch "youtube" "ReX-anddea" "inotia"
 inject "youtube" "ReX-anddea"
 
 #################################################
+
+finalize
