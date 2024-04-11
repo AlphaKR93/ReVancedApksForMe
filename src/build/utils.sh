@@ -236,9 +236,9 @@ dl_apk() {
 		*) url_regexp='$4'"[^@]*$6"''"[^@]*$5"'</div>[^@]*@\([^"]*\)' ;;
 	esac; fi
 
-        if [ ! -z $version ]; then
+	if [ -z $version ]; then
 		list_vers=$(_req "https://www.apkmirror.com/uploads/?appcategory=$2" -); debug "Response is: $list_vers"
-         	version=$(sed -n 's;.*Version:</span><span class="infoSlide-value">\(.*\) </span>.*;\1;p' <<< "$list_vers"); debug "Processed as: $version"
+		version=$(sed -n 's;.*Version:</span><span class="infoSlide-value">\(.*\) </span>.*;\1;p' <<< "$list_vers"); debug "Processed as: $version"
 		for v in $version; do versions=(${versions[@]} $v); done
 		verbose info "Found versions: ${versions[@]}"
   	fi
