@@ -226,7 +226,7 @@ _dl_apk() {
 
 dl_apk() {
 	verbose info "Attempting to download $2..."
-	local base_apk="$1.apk" attempt=0 list_vers=() versions=() url_regexp='APK</span>[^@]*@\([^#]*\)'
+	local ver_fixed=$([ ! -z $version ] && echo true) base_apk="$1.apk" attempt=0 list_vers=() versions=() url_regexp='APK</span>[^@]*@\([^#]*\)'
 
 	if [ ! -z $4 ]; then case $4 in
 		arm64-v8a) url_regexp='arm64-v8a'"[^@]*$6"''"[^@]*$5"'</div>[^@]*@\([^"]*\)' ;;
@@ -236,7 +236,7 @@ dl_apk() {
 		*) url_regexp='$4'"[^@]*$6"''"[^@]*$5"'</div>[^@]*@\([^"]*\)' ;;
 	esac; fi
 
-	if [ -z $version ]; then
+	if [ -z $ver_fixed ]; then
 		list_vers=$(_req "https://www.apkmirror.com/uploads/?appcategory=$2" -); debug "Response is: $list_vers"
 		version=$(sed -n 's;.*Version:</span><span class="infoSlide-value">\(.*\) </span>.*;\1;p' <<< "$list_vers"); debug "Processed as: $version"
 		for v in $version; do versions=(${versions[@]} $v); done
@@ -244,14 +244,17 @@ dl_apk() {
   	fi
 
 	while [ $attempt -lt 10 ]; do
-		[ ! -z $version ] && version=$(echo -e "$versions" | sed -n "$((attempt + 1))p")
+		[ -z $ver_fixed ] && version=$(echo -e "$versions" | sed -n "$((attempt + 1))p")
+		[ -z $version ] && fatal "No more versions to try"
+    
 		verbose info "Downloading $2 (version: $version, arch: $4, dpi: $5, android: $6)"
 		local dl_url=$(_dl_apk "https://www.apkmirror.com/apk/$3-${version//./-}-release/" "$url_regexp" "$base_apk")
 
 		[ -f "./download/$1.apk" ] && success "Successfully downloaded $2!" && break
 
 		warn "Failed to download $1, trying another version..."
-		((attempt++)); unvar version
+		[ -z $ver_fixed ] && unvar version
+		((attempt++))
 	done
 
 	[ $attempt -eq 10 ] && fatal "No more versions to try"
