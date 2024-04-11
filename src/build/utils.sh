@@ -1,5 +1,5 @@
 #!/bin/bash
-VERBOSE=$1 DEBUG=$2 version=$3
+VERBOSE=$1 DEBUG=$2
 
 # Colorful logs
 log()      { echo -e      "\e[0m$1\e[0m"; }
