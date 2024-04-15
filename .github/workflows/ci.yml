@@ -28,7 +28,11 @@ jobs:
       - name: Check new patch ReX forked by anddea beta
         id: check-rex-anddea-beta
         if: steps.check-gh.outputs.internet_error == '0'
-        run: bash src/etc/ci.sh anddea/revanced-patches prerelease rex-anddea.apk
+        run: bash src/etc/ci.sh rufusin/revanced-patches prerelease rex-anddea.apk
+      - name: Check new patch ReX Music forked by anddea beta
+        id: check-rex-music-anddea-beta
+        if: steps.check-gh.outputs.internet_error == '0'
+        run: bash src/etc/ci.sh rufusin/revanced-patches prerelease rex-music-anddea.apk
       - name: Check new patch Twitter Piko Beta
         id: check-twitter-piko-beta
         if: steps.check-gh.outputs.internet_error == '0'
@@ -62,6 +66,7 @@ jobs:
     outputs:
       check_rv_beta: ${{ steps.check-rv-beta.outputs.new_patch }}
       check_rex_anddea_beta: ${{ steps.check-rex-anddea-beta.outputs.new_patch }}
+      check_rex_music_anddea_beta: ${{  steps.check-check-rex-music-anddea-beta }}
       check_twitter_piko_beta: ${{ steps.check-twitter-piko-beta.outputs.new_patch }}
 
   Patch-Revanced-Beta:
@@ -77,7 +82,14 @@ jobs:
     if: ${{ needs.check.outputs.check_rex_anddea_beta == 1 }}
     uses: ./.github/workflows/manual-patch.yml
     with:
-      org: "ReX-anddea-beta"
+      org: "ReX-anddea-beta-yt"
+  Patch-ReX-Music-anddea-beta:
+    name: Patch ReX Music forked by anddea beta
+    needs: check
+    if: ${{ needs.check.outputs.check_rex_music_anddea_beta == 1 }}
+    uses: ./.github/workflows/manual-patch.yml
+    with:
+      org: "ReX-anddea-beta-muisc"
   Patch-Twitter-Piko-Beta:
     name: Patch Twitter Piko Beta
     needs: check
