@@ -28,11 +28,11 @@ jobs:
       - name: Check new patch ReX forked by anddea beta
         id: check-rex-anddea-beta
         if: steps.check-gh.outputs.internet_error == '0'
-        run: bash src/etc/ci.sh rufusin/revanced-patches prerelease rex-anddea.apk
+        run: bash src/etc/ci.sh anddea/revanced-patches prerelease rex-anddea.apk
       - name: Check new patch ReX Music forked by anddea beta
         id: check-rex-music-anddea-beta
         if: steps.check-gh.outputs.internet_error == '0'
-        run: bash src/etc/ci.sh rufusin/revanced-patches prerelease rex-music-anddea.apk
+        run: bash src/etc/ci.sh anddea/revanced-patches prerelease rex-music-anddea.apk
       - name: Check new patch Twitter Piko Beta
         id: check-twitter-piko-beta
         if: steps.check-gh.outputs.internet_error == '0'
