@@ -7,7 +7,7 @@ initialize
 
 start "Patching YouTube APK with ReX forked by anddea..."
 
-dl_gh "revanced-patches revanced-integrations" "rufusin" "prerelease"
+dl_gh "revanced-patches revanced-integrations" "anddea" "prerelease"
 dl_gh "revanced-cli" "inotia00" "latest"
 
 get_patches_key "com.google.android.youtube"
