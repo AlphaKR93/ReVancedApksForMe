@@ -66,7 +66,7 @@ jobs:
     outputs:
       check_rv_beta: ${{ steps.check-rv-beta.outputs.new_patch }}
       check_rex_anddea_beta: ${{ steps.check-rex-anddea-beta.outputs.new_patch }}
-      check_rex_music_anddea_beta: ${{  steps.check-check-rex-music-anddea-beta }}
+      check_rex_music_anddea_beta: ${{  steps.check-rex-music-anddea-beta.outputs.new_patch }}
       check_twitter_piko_beta: ${{ steps.check-twitter-piko-beta.outputs.new_patch }}
 
   Patch-Revanced-Beta:
