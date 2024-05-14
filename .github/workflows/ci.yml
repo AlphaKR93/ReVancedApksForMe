@@ -91,11 +91,11 @@ jobs:
     if: ${{ needs.check.outputs.check_rex_anddea_beta == 1 }}
     uses: ./.github/workflows/manual-patch.yml
     with:
-      org: "Rex-anddea-beta-yt"
+      org: "Rex-anddea-beta"
   Patch-ReX-Music-anddea-beta:
     name: Patch ReX Music forked by anddea beta
     needs: check
-    if: ${{ needs.check.outputs.check_rex_music_anddea_beta == 1 }}
+    if: ${{ needs.check.outputs.check_rex_music_anddea_beta == 2 }}
     uses: ./.github/workflows/manual-patch.yml
     with:
       org: "Rex-anddea-beta-music"
