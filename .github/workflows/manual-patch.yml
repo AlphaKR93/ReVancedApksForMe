@@ -83,7 +83,7 @@ jobs:
   #       uses: ./.github/actions/re-run
   patch_rex_anddea_beta:
     name: Patch ReX forked by anddea beta
-    if: ${{ github.event.inputs.org == 'ReX-anddea-beta' || github.event.inputs.org == 'ReX-anddea-beta-yt' || github.event.inputs.org == 'All' || inputs.org == 'ReX-anddea-beta' }}
+    if: ${{ github.event.inputs.org == 'ReX-anddea-beta' || github.event.inputs.org == 'ReX-anddea-beta-yt' || github.event.inputs.org == 'All' || inputs.org == 'ReX-anddea-beta-yt' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -106,7 +106,7 @@ jobs:
         uses: ./.github/actions/re-run
   patch_rex_anddea_beta_music:
     name: Patch ReX Music forked by anddea beta
-    if: ${{ github.event.inputs.org == 'ReX-anddea-beta' || github.event.inputs.org == 'ReX-anddea-beta-music' || github.event.inputs.org == 'All' || inputs.org == 'ReX-anddea-beta' }}
+    if: ${{ github.event.inputs.org == 'ReX-anddea-beta' || github.event.inputs.org == 'ReX-anddea-beta-music' || github.event.inputs.org == 'All' || inputs.org == 'ReX-anddea-beta-music' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
