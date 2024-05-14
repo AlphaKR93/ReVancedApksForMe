@@ -88,17 +88,17 @@ jobs:
   Patch-ReX-anddea-beta:
     name: Patch ReX forked by anddea beta
     needs: check
-    if: ${{ needs.check.outputs.check_rex_anddea_beta == 2 }}
+    if: ${{ needs.check.outputs.check_rex_anddea_beta == 1 }}
     uses: ./.github/workflows/manual-patch.yml
     with:
-      org: "ReX-anddea-beta"
+      org: "Rex-anddea-beta-yt"
   Patch-ReX-Music-anddea-beta:
     name: Patch ReX Music forked by anddea beta
     needs: check
     if: ${{ needs.check.outputs.check_rex_music_anddea_beta == 1 }}
     uses: ./.github/workflows/manual-patch.yml
     with:
-      org: "ReX-anddea-beta"
+      org: "Rex-anddea-beta-music"
   Patch-Twitter-Piko-Beta:
     name: Patch Twitter Piko Beta
     needs: check
