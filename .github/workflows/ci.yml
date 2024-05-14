@@ -70,7 +70,7 @@ jobs:
         if: steps.check-gh.outputs.internet_error == '0'
         run: |
           echo "ReX Anddea: ${{ steps.check-rex-anddea-beta.outputs.new_patch }}"
-          echo "ReX Anddea Music: ${{ steps.check-rex-anddea-beta-music.outputs.new_patch }}"
+          echo "ReX Anddea Music: ${{ steps.check-rex-music-anddea-beta.outputs.new_patch }}"
           echo "Twitter Piko: ${{ steps.check-twitter-piko-beta.outputs.new_patch }}"
     outputs:
       check_rv_beta: ${{ steps.check-rv-beta.outputs.new_patch }}
@@ -98,7 +98,7 @@ jobs:
     if: ${{ needs.check.outputs.check_rex_music_anddea_beta == 1 }}
     uses: ./.github/workflows/manual-patch.yml
     with:
-      org: "ReX-anddea-beta-muisc"
+      org: "ReX-anddea-beta-music"
   Patch-Twitter-Piko-Beta:
     name: Patch Twitter Piko Beta
     needs: check
