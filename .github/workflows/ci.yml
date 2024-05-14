@@ -1,6 +1,9 @@
 name: Check new patch
 permissions: write-all
 on:
+  push:
+    paths:
+      - .github/workflows/ci.yml
   schedule:
     - cron: "*/5 * * * *"
   workflow_dispatch:
@@ -63,6 +66,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           retry_count: ${{ github.event.inputs.retry_count }}
           max_retries: 3
+      - name: Summary
+        if: steps.check-gh.outputs.internet_error == '0'
+        run: |
+          echo "ReX Anddea: ${{ steps.check-rex-anddea-beta.outputs.new_patch }}"
+          echo "ReX Anddea Music: ${{ steps.check-rex-anddea-beta-music.outputs.new_patch }}"
+          echo "Twitter Piko: ${{ steps.check-twitter-piko-beta.outputs.new_patch }}"
     outputs:
       check_rv_beta: ${{ steps.check-rv-beta.outputs.new_patch }}
       check_rex_anddea_beta: ${{ steps.check-rex-anddea-beta.outputs.new_patch }}
