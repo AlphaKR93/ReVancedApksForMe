@@ -257,7 +257,12 @@ dl_apk() {
 		((attempt++))
 	done
 
-	[ $attempt -eq 10 ] && fatal "No more versions to try"
+	[ $attempt -eq 10 ] && if [ -z $4 ]; then
+ 		warn "attempting to download merged apk..."
+   		dl_apk "$1" "$2" "$3"
+     	else
+ 		fatal "No more versions to try"
+	fi
 	[ ! -f "./download/$1.apk" ] && fatal "Failed to download $1"
 
 	_done
