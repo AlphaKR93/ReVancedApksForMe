@@ -1,12 +1,21 @@
 #!/bin/bash
-# Twitter Piko
-source src/build/utils.sh
+source src/main.sh
 
-initialize
+init "x-corp" "twitter" "com.twitter.android"
+using "crimera"
 
-#################################################
+nofail || resolve --bundled "arm64-v8a"
+missing --base && (nolog || resolve)
 
-start "Downloading and Merging Twitter APK..."
+patch --dev "Piko ReVanced-Integrations"
+patch --dev "ReVanced-Patches ReVanced-Integrations" "ReVanced" --reverse
+inject
+
+complete
+
+################################################################################
+
+task "Downloading and Merging Twitter APK..."
 
 dl_gh "APKEditor" "REAndroid" "latest"
 dl_apk "twitter-bundled" "twitter" "x-corp/twitter/twitter" "arm64-v8a"
@@ -15,13 +24,13 @@ purge "APKEditor-*.jar"
 
 #################################################
 
-start "Downloading Pre-requirements..."
+task "Downloading Pre-requirements..."
 
 dl_gh "ReVanced-CLI" "ReVanced" "latest"
 
 #################################################
 
-start "Patching Twitter APK with Piko..."
+task "Patching Twitter APK with Piko..."
 
 dl_gh "Piko ReVanced-Integrations" "Crimera" "prerelease"
 get_patches_key "com.twitter.android"
@@ -30,7 +39,7 @@ purge "patches.json revanced-patches-*.jar revanced-integrations-*.apk"
 
 #################################################
 
-start "Patching Twitter-Piko APK with ReVanced..."
+task "Patching Twitter-Piko APK with ReVanced..."
 
 dl_gh "ReVanced-Patches ReVanced-Integrations" "ReVanced" "prerelease"
 get_patches_key "com.twitter.android" -
@@ -39,10 +48,9 @@ purge "patches.json revanced-patches-*.jar revanced-integrations-*.apk"
 
 #################################################
 
-start "Injecting LSPatch..."
+task "Injecting LSPatch..."
 
 dl_gh "LSPatch" "LSPosed" "latest"
-dl_gh "TwiFucker" "dr-tsng" "latest"
 inject "twitter" "piko" "TwiFucker"
 purge "jar-*.jar TwiFucker-*.apk"
 

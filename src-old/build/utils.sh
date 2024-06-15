@@ -2,12 +2,12 @@
 VERBOSE=$1 DEBUG=$2 version=$3
 
 # Colorful logs
+task()     { echo -e "\e[35m[&] $1\e[0m"; }
 log()      { echo -e      "\e[0m$1\e[0m"; }
 error()    { echo -e "\e[31m[!] $1\e[0m"; }
 success()  { echo -e "\e[32m[+] $1\e[0m"; }
 warn()     { echo -e "\e[33m[-] $1\e[0m"; }
 info()     { echo -e "\e[34m[*] $1\e[0m"; }
-start()    { echo -e "\e[35m[&] $1\e[0m"; }
 _log()     { echo -e "\e[96m[@] $1\e[0m"; }
 debug()    { [ "$DEBUG" == "true" ] && echo -e "\e[90m[#] $1\e[0m"; }
 verbose()  { [ "$VERBOSE" == "true" ] && $1 "$2"; }
@@ -135,15 +135,16 @@ dl_gh() {
 
 # Get patches list:
 get_patches_key() {
-	info "Reading patches info..."
 	patches=() excludePatches=() includePatches=(); local patch name
-	exist "revanced-cli-*.jar revanced-patches-*.jar src/patches/$1/exclude-patches"
+	exist "revanced-cli-*.jar *-patches-*.jar"
 
 	info "Reading patches info..."
-	patches=$(java -jar revanced-cli-*.jar list-patches revanced-patches-*.jar -f $1 | grep Name | cut -d " " -f 2-)
+	patches=$(java -jar revanced-cli-*.jar list-patches *-patches-*.jar -f $1 | grep Name | cut -d " " -f 2-)
 	debug "Response is: $patches"
 
 	if [ "$2" == "-" ]; then
+		exist "src/patches/$1/include-patches"
+
 		verbose info "Reading included patches..."
 		while IFS= read -r patch; do
 			debug "Processing: $patch"
@@ -165,6 +166,8 @@ get_patches_key() {
 		done
 		unvar "patches"; _done; return
 	fi
+	
+	[ ! -f "$(ls "src/patches/$1/exclude-patches")" ] && return
 
 	verbose info "Reading excluded patches..."
 	while IFS= read -r patch; do
@@ -200,7 +203,7 @@ get_ver() {
 
 # Download apks files from APKMirror:
 _req() {
-	local header="User-Agent: Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.6099.231 Mobile Safari/537.36"
+	local header=""
 
     if [ "$2" == "-" ]; then
         wget -nv -O "$2" --header="$header" "$1" || rm -f "$2"

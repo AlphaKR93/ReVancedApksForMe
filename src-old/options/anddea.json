@@ -1,0 +1,51 @@
+[
+    {
+      "patchName": "Shorts overlay buttons",
+      "options": [
+        {
+          "key": "IconType",
+          "value": "Outline"
+        }
+      ]
+    },
+    {
+      "patchName": "Tuck away preferences",
+      "options": [
+        {
+          "key": "SettingElements",
+          "value": ""
+        }
+      ]
+    },
+    {
+      "patchName": "Custom double tap length",
+      "options": [
+        {
+          "key": "DoubleTapLengthArrays",
+          "value": "3, 5, 10, 15, 20, 30, 60, 120, 180"
+        }
+      ]
+    },
+    {
+      "patchName": "Custom branding icon YouTube",
+      "options": [
+        {
+          "key": "AppIcon",
+          "value": "AFN Blue"
+        }
+      ]
+    },
+    {
+      "patchName": "Custom branding icon YouTube Music",
+      "options": [
+        {
+          "key": "SplashHeaderIcon",
+          "value": true
+        },
+        {
+          "key": "AppIcon",
+          "value": "AFN Blue"
+        }
+      ]
+    }
+  ]

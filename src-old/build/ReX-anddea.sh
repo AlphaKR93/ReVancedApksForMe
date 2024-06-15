@@ -1,7 +1,14 @@
 #!/bin/bash
 source src/build/utils.sh
 
-initialize
+init "google-inc" "youtube" "com.google.android.youtube"
+using --inotia "anddea"
+
+fetch --resolve-version
+patch --dev "ReVanced-Patches ReVanced-Integrations"
+inject
+
+complete
 
 #################################################
 
