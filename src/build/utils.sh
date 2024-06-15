@@ -285,7 +285,7 @@ merge() {
 # Patching apps with Revanced CLI:
 patch() {
 	info "Attempting to patch $1..."
-	exist "revanced-cli-*.jar revanced-patches-*.jar ./download/$1.apk"
+	exist "revanced-cli-*.jar *-patches-*.jar ./download/$1.apk"
 
 	local num=0 patch="patch " bundle="--patch-bundle" merge="--merge" ks="_ks" purge="--purge=true" dir="./download/$1.apk"
 
@@ -309,8 +309,8 @@ patch() {
 	[ "$4" == "-" ] && dir=$5
 
 	_eval "java -jar revanced-cli-*.jar $patch
-		$bundle revanced-patches-*.jar
-		$merge revanced-integrations-*.apk
+		$bundle *-patches-*.jar
+		$merge *-integrations-*.apk
 		$excludePatches
 		$includePatches
 		--options=./src/options/$2.json
