@@ -11,7 +11,7 @@ dl_gh "revanced-patches revanced-integrations" "anddea" "prerelease"
 dl_gh "revanced-cli" "inotia00" "latest"
 
 get_patches_key "com.google.android.youtube"
-[ -z "$3" ] && get_ver "Hide general ads" "com.google.android.youtube"
+[ -z "$3" ] && get_ver "Hide ads" "com.google.android.youtube"
 
 dl_apk "rex" "youtube" "google-inc/youtube/youtube"
 patch "rex" "anddea" "inotia"
