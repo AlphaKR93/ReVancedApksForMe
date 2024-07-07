@@ -9,7 +9,7 @@ initialize
 start "Downloading and Merging Discord APK..."
 
 dl_gh "APKEditor" "REAndroid" "latest"
-dl_apk "discord-bundled" "discord-inc" "x-corp/discord-chat-for-gamers/discord-chat-for-gamers" "arm64-v8a"
+dl_apk "discord-bundled" "discord-chat-for-gamers" "x-corp/discord-chat-for-gamers/discord-chat-for-gamers" "arm64-v8a"
 merge "discord"
 purge "APKEditor-*.jar"
 
