@@ -34,11 +34,11 @@ jobs:
         run: bash src/etc/ci.sh anddea/revanced-patches prerelease rex-music-anddea.apk
       - name: Check new patch Twitter Piko Beta
         id: check-twitter-piko-beta
-        if: false && steps.check-gh.outputs.internet_error == '0'
+        if: steps.check-gh.outputs.internet_error == '0'
         run: bash src/etc/ci.sh crimera/piko prerelease twitter-piko.apk
       - name: Check new patch Discord Pyoncord
         id: check-discord-pyoncord
-        if: false && steps.check-gh.outputs.internet_error == '0'
+        if: steps.check-gh.outputs.internet_error == '0'
         run: bash src/etc/ci.sh pyoncord/bunnyxposed prerelease discord-pyoncord.apk
       - name: Keep workflow run
         if: steps.check-gh.outputs.internet_error == '0'
