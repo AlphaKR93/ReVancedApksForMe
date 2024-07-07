@@ -26,7 +26,7 @@ jobs:
         run: bash src/etc/connection.sh
       - name: Check new patch ReX forked by anddea beta
         id: check-rex-anddea-beta
-        if: false && steps.check-gh.outputs.internet_error == '0'
+        if: steps.check-gh.outputs.internet_error == '0'
         run: bash src/etc/ci.sh anddea/revanced-patches prerelease rex-anddea.apk
       - name: Check new patch ReX Music forked by anddea beta
         id: check-rex-music-anddea-beta
