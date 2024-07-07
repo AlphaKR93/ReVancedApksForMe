@@ -36,10 +36,10 @@ jobs:
         id: check-twitter-piko-beta
         if: steps.check-gh.outputs.internet_error == '0'
         run: bash src/etc/ci.sh crimera/piko prerelease twitter-piko.apk
-      - name: Check new patch Discord Pyoncord
-        id: check-discord-pyoncord
-        if: steps.check-gh.outputs.internet_error == '0'
-        run: bash src/etc/ci.sh pyoncord/bunnyxposed prerelease discord-pyoncord.apk
+      # - name: Check new patch Discord Pyoncord
+      #   id: check-discord-pyoncord
+      #   if: steps.check-gh.outputs.internet_error == '0'
+      #   run: bash src/etc/ci.sh pyoncord/bunnyxposed prerelease discord-pyoncord.apk
       - name: Keep workflow run
         if: steps.check-gh.outputs.internet_error == '0'
         uses: gautamkrishnar/keepalive-workflow@v1
