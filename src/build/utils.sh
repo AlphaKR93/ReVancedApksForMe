@@ -137,10 +137,10 @@ dl_gh() {
 get_patches_key() {
 	info "Reading patches info..."
 	patches=() excludePatches=() includePatches=(); local patch name
-	exist "revanced-cli-*.jar revanced-patches-*.jar src/patches/$1/exclude-patches"
+	exist "*-cli-*.jar *-patches-*.jar src/patches/$1/exclude-patches"
 
 	info "Reading patches info..."
-	patches=$(java -jar revanced-cli-*.jar list-patches revanced-patches-*.jar -f $1 | grep Name | cut -d " " -f 2-)
+	patches=$(java -jar ./*-cli-*.jar list-patches ./*-patches-*.jar -f $1 | grep Name | cut -d " " -f 2-)
 	debug "Response is: $patches"
 
 	if [ "$2" == "-" ]; then
