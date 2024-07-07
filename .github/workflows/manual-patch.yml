@@ -21,15 +21,16 @@ on:
           - 'Rex-anddea-beta-yt'
           - 'Rex-anddea-beta-music'
           - 'Twitter Piko Beta'
+          - 'Discord Pyoncord'
       verbose:
         description: 'Enable verbose mode?'
         required: true
-        default: 'false'
+        default: false
         type: boolean
       debug:
         description: 'Enable debug mode?'
         required: true
-        default: 'false'
+        default: false
         type: boolean
       retry_count:
         description: 'Do not change value below'
@@ -53,34 +54,6 @@ on:
         required: true
         type: string
 jobs:
-  # patch_rv_beta:
-  #   name: Patch Revanced Beta
-  #   if: ${{ github.event.inputs.org == 'Revanced Beta' || inputs.org == 'Revanced Beta' }}
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       Include:
-  #         - org: "Revanced-Beta"
-  #           run: "A"
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4.1.1
-  #     - name: Preparing to patch
-  #       uses: ./.github/actions/preparing
-  #     - name: Check github connection
-  #       id: check-gh-rvb
-  #       run: bash src/etc/connection.sh
-  #     - name: Patch apk
-  #       id: patch-rvb
-  #       if: steps.check-gh-rvb.outputs.internet_error == '0'
-  #       run: bash src/build/Revanced-${{ matrix.Include.run }}.sh
-  #     - name: Releasing APK files
-  #       id: release-rvb
-  #       if: steps.check-gh-rvb.outputs.internet_error == '0'
-  #       uses: ./.github/actions/release
-  #     - name: Re-run workflow if github connection not stable
-  #       if: always() && steps.patch-rvb.outcome == 'skipped' || steps.release-rvb.outcome == 'skipped' && env.retry_count < env.max_retries && matrix.Include.run == '1'
-  #       uses: ./.github/actions/re-run
   patch_rex_anddea_beta:
     name: Patch ReX forked by anddea beta
     if: ${{ github.event.inputs.org == 'ReX-anddea-beta' || github.event.inputs.org == 'ReX-anddea-beta-yt' || github.event.inputs.org == 'All' || inputs.org == 'ReX-anddea-beta-yt' }}
@@ -149,4 +122,27 @@ jobs:
         uses: ./.github/actions/release
       - name: Re-run workflow if github connection not stable
         if: always() && steps.patch-piko-beta.outcome == 'skipped' || steps.release-piko-beta.outcome == 'skipped' && env.retry_count < env.max_retries
+        uses: ./.github/actions/re-run
+  patch_discord_pyoncord:
+    name: Patch Discord Pyoncord
+    if: ${{ github.event.inputs.org == 'Discord Pyoncord' || github.event.inputs.org == 'All' || inputs.org == 'Discord Pyoncord' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+      - name: Preparing to patch
+        uses: ./.github/actions/preparing
+      - name: Check github connection
+        id: check-gh-pyoncord
+        run: bash src/etc/connection.sh
+      - name: Patch apk
+        id: patch-pyoncord
+        if: steps.check-gh-pyoncord.outputs.internet_error == '0'
+        run: bash src/build/Pyoncord.sh ${{ github.event.inputs.verbose }} ${{ github.event.inputs.debug }} ${{ github.event.inputs.twitter }}
+      - name: Releasing APK files
+        id: release-pyoncord
+        if: steps.check-gh-pyoncord.outputs.internet_error == '0'
+        uses: ./.github/actions/release
+      - name: Re-run workflow if github connection not stable
+        if: always() && steps.patch-pyoncord.outcome == 'skipped' || steps.release-pyoncord.outcome == 'skipped' && env.retry_count < env.max_retries
         uses: ./.github/actions/re-run

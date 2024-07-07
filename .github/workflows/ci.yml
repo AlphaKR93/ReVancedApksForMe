@@ -24,10 +24,6 @@ jobs:
       - name: Check github connection
         id: check-gh
         run: bash src/etc/connection.sh
-#      - name: Check new patch ReVanced Beta
-#        id: check-rv-beta
-#        if: steps.check-gh.outputs.internet_error == '0'
-#        run: bash src/etc/ci.sh ReVanced/revanced-patches prerelease youtube-beta-revanced.apk
       - name: Check new patch ReX forked by anddea beta
         id: check-rex-anddea-beta
         if: false && steps.check-gh.outputs.internet_error == '0'
@@ -40,6 +36,10 @@ jobs:
         id: check-twitter-piko-beta
         if: false && steps.check-gh.outputs.internet_error == '0'
         run: bash src/etc/ci.sh crimera/piko prerelease twitter-piko.apk
+      - name: Check new patch Discord Pyoncord
+        id: check-discord-pyoncord
+        if: false && steps.check-gh.outputs.internet_error == '0'
+        run: bash src/etc/ci.sh pyoncord/bunnyxposed prerelease discord-pyoncord.apk
       - name: Keep workflow run
         if: steps.check-gh.outputs.internet_error == '0'
         uses: gautamkrishnar/keepalive-workflow@v1
@@ -72,19 +72,13 @@ jobs:
           echo "ReX Anddea: ${{ steps.check-rex-anddea-beta.outputs.new_patch }}"
           echo "ReX Anddea Music: ${{ steps.check-rex-music-anddea-beta.outputs.new_patch }}"
           echo "Twitter Piko: ${{ steps.check-twitter-piko-beta.outputs.new_patch }}"
+          echo "Discord Pyoncord: ${{ steps.check-discord-pyoncord.outputs.new_patch }}"
     outputs:
-      check_rv_beta: ${{ steps.check-rv-beta.outputs.new_patch }}
       check_rex_anddea_beta: ${{ steps.check-rex-anddea-beta.outputs.new_patch }}
       check_rex_music_anddea_beta: ${{  steps.check-rex-music-anddea-beta.outputs.new_patch }}
       check_twitter_piko_beta: ${{ steps.check-twitter-piko-beta.outputs.new_patch }}
+      check_discord_pyoncord: ${{ steps.check-discord-pyoncord.outputs.new_patch }}
 
-  Patch-Revanced-Beta:
-    name: Patch Revanced Beta
-    needs: check
-    if: ${{ needs.check.outputs.check_rv_beta == 1 }}
-    uses: ./.github/workflows/manual-patch.yml
-    with:
-      org: "Revanced Beta"
   Patch-ReX-anddea-beta:
     name: Patch ReX forked by anddea beta
     needs: check
@@ -106,3 +100,10 @@ jobs:
     uses: ./.github/workflows/manual-patch.yml
     with:
       org: "Twitter Piko Beta"
+  Patch-Discord-Pyoncord:
+    name: Patch Discord Pyoncord
+    needs: check
+    if: ${{ needs.check.outputs.check_discord_pyoncord == 1 }}
+    uses: ./.github/workflows/manual-patch.yml
+    with:
+      org: "Discord Pyoncord"
