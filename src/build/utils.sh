@@ -229,6 +229,7 @@ dl_apk() {
 	local ver_fixed=$([ ! -z $version ] && echo true) base_apk="$1.apk" attempt=0 list_vers=() versions=() url_regexp='APK</span>[^@]*@\([^#]*\)'
 
 	if [ ! -z $4 ]; then case $4 in
+ 		bundle) url_regexp='BUNDLE</span>[^@]*@\([^#]*\)' ;;
 		arm64-v8a) url_regexp='arm64-v8a'"[^@]*$6"''"[^@]*$5"'</div>[^@]*@\([^"]*\)' ;;
 		armeabi-v7a) url_regexp='armeabi-v7a'"[^@]*$6"''"[^@]*$5"'</div>[^@]*@\([^"]*\)' ;;
 		x86) url_regexp='x86'"[^@]*$6"''"[^@]*$5"'</div>[^@]*@\([^"]*\)' ;;
