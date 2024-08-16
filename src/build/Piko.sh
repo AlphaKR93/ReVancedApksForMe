@@ -9,7 +9,7 @@ initialize
 start "Downloading and Merging Twitter APK..."
 
 dl_gh "APKEditor" "REAndroid" "latest"
-dl_apk "twitter-bundled" "twitter" "x-corp/twitter/twitter" "arm64-v8a"
+dl_apk "twitter-bundled" "twitter" "x-corp/twitter/twitter" bundle
 merge "twitter"
 purge "APKEditor-*.jar"
 
