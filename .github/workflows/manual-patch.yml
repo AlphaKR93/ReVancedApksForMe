@@ -115,7 +115,7 @@ jobs:
       - name: Patch apk
         id: patch-piko-beta
         if: steps.check-gh-piko-beta.outputs.internet_error == '0'
-        run: bash src/build/Piko.sh ${{ github.event.inputs.verbose }} ${{ github.event.inputs.debug }} ${{ github.event.inputs.twitter }}
+        run: bash src/build/Piko.sh true true ${{ github.event.inputs.twitter }}
       - name: Releasing APK files
         id: release-piko-beta
         if: steps.check-gh-piko-beta.outputs.internet_error == '0'
