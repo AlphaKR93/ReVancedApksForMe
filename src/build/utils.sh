@@ -215,7 +215,7 @@ _dl_apk() {
 	url="https://www.apkmirror.com$(_req "$url" - | tr '\n' ' ' | sed -n "s/href=\"/@/g; s;.*${regexp}.*;\1;p")"
 	sleep 5
 
-	url=$(req "$url" - | $HTMLQ --base https://www.apkmirror.com --attribute href ".downloadButton")
+	url=$(req "$url" - | $htmlq --base https://www.apkmirror.com --attribute href ".downloadButton")
 	sleep 5
 
    	url=$(_req "$url" - | $htmlq --base https://www.apkmirror.com --attribute href "span > a[rel = nofollow]")
