@@ -103,6 +103,7 @@ dl_gh() {
 			# Process "prerelease"
 			if [[ "$line" =~ "\"prerelease\":" ]]; then
 				prerelease=$(echo $line | cut -d ' ' -f 2 | tr -d ',')
+    				debug "Prerelease: $prerelease"
 				if [ "$tag" == "prerelease" ] && [ "$prerelease" == "false" ]; then
 					found=0
 				elif [ "$tag" == "latest" ] && [ "$prerelease" == "true" ]; then
