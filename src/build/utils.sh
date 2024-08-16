@@ -114,7 +114,7 @@ dl_gh() {
 			# Check response has assets
 			[[ "$line" =~ *"\"assets\":"* ]] && [ $found -eq 1 ] && assets=1
    			debug "$found $assets"
-			[ ! $assets -ne 1 ] && continue
+			[ $assets -ne 1 ] && continue
 
 			# Download assets
 			if [[ "$line" =~ "\"browser_download_url\":" ]]; then
